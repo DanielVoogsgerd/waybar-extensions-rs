@@ -11,9 +11,14 @@ pub struct WaybarResponse {
 
 #[tokio::main]
 async fn main() {
-    let config =
-        waybar_extensions::config::Config::from_file("/home/daniel/.config/waybar/modules.toml")
-            .expect("Could not read configuration");
+    // Configuration can be found in XDG_CONFIG_HOME/waybar/modules.toml
+    let config_path = xdg::BaseDirectories::with_prefix("waybar")
+        .expect("Could not waybar configuration")
+        .find_config_file("modules.toml")
+        .expect("Could not find modules.toml");
+
+    let config = waybar_extensions::config::Config::from_file(&config_path)
+        .expect("Could not read configuration");
 
     let weather = weather::current::get(
         config.general.lat,
