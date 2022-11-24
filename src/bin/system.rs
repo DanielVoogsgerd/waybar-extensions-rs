@@ -1,15 +1,6 @@
 use std::path::PathBuf;
 use std::process::Command;
 
-use serde::Serialize;
-
-#[derive(Serialize)]
-struct WaybarResponse {
-    text: String,
-    tooltip: String,
-    class: Vec<String>,
-}
-
 fn get_current_kernel() -> Result<String, Box<dyn std::error::Error>> {
     let command_output = Command::new("uname").arg("-r").output()?;
     let mut output_string = String::from_utf8(command_output.stdout)?;
@@ -69,7 +60,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         tooltip.push_str("\nLoaded kernel is outdated");
     }
 
-    let waybar_response = WaybarResponse {
+    let waybar_response = waybar_extensions::waybar::WaybarResponse {
         text: warning_count.to_string(),
         tooltip,
         class,
