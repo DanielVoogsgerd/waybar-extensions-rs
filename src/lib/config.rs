@@ -8,6 +8,7 @@ pub struct Config {
     pub general: GeneralConfig,
     pub openweathermap: OpenWeatherMapConfig,
     pub org_clock: OrgClockConfig,
+    pub unfinished_projects: UnfinishedProjectsConfig,
 }
 
 impl Config {
@@ -44,4 +45,11 @@ pub struct OrgClockConfig {
     pub notify_time: u32,
     pub notify_interval: u32,
     pub alert_time: u32,
+}
+
+#[derive(Deserialize)]
+pub struct UnfinishedProjectsConfig {
+    pub max_age: u64,
+    pub max_file_depth: Option<usize>,
+    pub max_project_depth: Option<usize>,
 }
