@@ -49,6 +49,7 @@ pub struct OrgClockConfig {
 
 #[derive(Deserialize)]
 pub struct UnfinishedProjectsConfig {
+    pub project_dirs: Vec<String>,
     pub max_age: u64,
     pub max_file_depth: Option<usize>,
     pub max_project_depth: Option<usize>,
