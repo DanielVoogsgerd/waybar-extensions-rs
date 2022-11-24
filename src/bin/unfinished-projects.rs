@@ -14,45 +14,47 @@ pub struct WaybarResponse {
     class: Vec<String>,
 }
 
-/// Starting project dir
-const PROJECT_DIR: &str = "/home/daniel/dev";
-
 /// Statuses to ignore
 const IGNORE_STATUSES: Status = Status::IGNORED.union(Status::WT_DELETED);
 
 fn main() {
-    let start_dir = Path::new(PROJECT_DIR);
-
     let config = Config::load("waybar", "modules.toml").expect("Could not load configuration");
 
-    let repos = get_dirs(start_dir)
-        .expect("Could not read dir")
-        .filter(|dir| is_git_repo(dir))
-        .filter_map(|project_path| {
-            let repo = Repository::open(&project_path).expect("Could not open repository");
-            let status = repo
-                .statuses(None)
-                .expect("Could not get status")
-                .iter()
-                .filter_map(|x| Some((x.path()?.to_owned(), x.status())))
-                .collect::<Vec<_>>();
+    let repos = config
+        .unfinished_projects
+        .project_dirs
+        .iter()
+        .flat_map(|project_dir| {
+            let start_dir = Path::new(project_dir);
+            get_dirs(start_dir)
+                .expect("Could not read dir")
+                .filter(|dir| is_git_repo(dir))
+                .filter_map(|project_path| {
+                    let repo = Repository::open(&project_path).expect("Could not open repository");
+                    let status = repo
+                        .statuses(None)
+                        .expect("Could not get status")
+                        .iter()
+                        .filter_map(|x| Some((x.path()?.to_owned(), x.status())))
+                        .collect::<Vec<_>>();
 
-            let uncommitted_files = status
-                .iter()
-                .filter_map(|(path, status)| {
-                    (!IGNORE_STATUSES.intersects(*status))
-                        .then_some((project_path.join(path), *status))
-                })
-                .map(|(path, status)| {
-                    (
-                        path.clone(),
-                        path_age(&path, config.unfinished_projects.max_file_depth),
-                        status,
-                    )
-                })
-                .collect::<Vec<_>>();
+                    let uncommitted_files = status
+                        .iter()
+                        .filter_map(|(path, status)| {
+                            (!IGNORE_STATUSES.intersects(*status))
+                                .then_some((project_path.join(path), *status))
+                        })
+                        .map(|(path, status)| {
+                            (
+                                path.clone(),
+                                path_age(&path, config.unfinished_projects.max_file_depth),
+                                status,
+                            )
+                        })
+                        .collect::<Vec<_>>();
 
-            (uncommitted_files.len() != 0).then_some((project_path, uncommitted_files))
+                    (uncommitted_files.len() != 0).then_some((project_path, uncommitted_files))
+                })
         })
         .collect::<Vec<_>>();
 
