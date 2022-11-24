@@ -5,7 +5,7 @@ use std::{
 };
 
 use git2::{Repository, Status};
-use waybar_extensions::config::Config;
+use waybar_extensions::{config::Config, waybar::columnize_output};
 
 #[derive(serde::Serialize)]
 pub struct WaybarResponse {
@@ -56,7 +56,7 @@ fn main() {
         })
         .collect::<Vec<_>>();
 
-    let output = repos
+    let mut output = repos
         .iter()
         .filter(|(_project_path, uncommitted_files)| {
             if let Some((_, Some(max_age), _)) = uncommitted_files
@@ -68,19 +68,22 @@ fn main() {
                 false
             }
         })
+        .map(|(project_path, uncommitted_changes)| {
+            vec![
+                project_path
+                    .file_name()
+                    .expect("Could not get filename")
+                    .to_string_lossy()
+                    .into_owned(),
+                format!("{}", uncommitted_changes.len()),
+            ]
+        })
         .collect::<Vec<_>>();
 
-    let mut tooltip = String::new();
-    for (project_path, uncommitted_files) in output.iter() {
-        tooltip.push_str(&format!(
-            "{:} has {} uncommitted changes\n",
-            project_path
-                .file_name()
-                .expect("Could not get filename")
-                .to_string_lossy(),
-            uncommitted_files.len()
-        ))
-    }
+    output.sort_by_key(|columns| columns[0].to_lowercase());
+
+    let headings = vec![String::from("Repository"), String::from("Changes")];
+    let tooltip = columnize_output(&output, &headings);
 
     let text = format!("{}", output.len());
 
