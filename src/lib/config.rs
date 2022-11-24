@@ -7,6 +7,7 @@ use serde::Deserialize;
 pub struct Config {
     pub general: GeneralConfig,
     pub openweathermap: OpenWeatherMapConfig,
+    pub org_clock: OrgClockConfig,
 }
 
 impl Config {
@@ -36,4 +37,11 @@ pub struct GeneralConfig {
 #[derive(Deserialize)]
 pub struct OpenWeatherMapConfig {
     pub api_key: String,
+}
+
+#[derive(Deserialize)]
+pub struct OrgClockConfig {
+    pub notify_time: u32,
+    pub notify_interval: u32,
+    pub alert_time: u32,
 }
