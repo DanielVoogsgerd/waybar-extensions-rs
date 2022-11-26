@@ -67,10 +67,8 @@ async fn updater(state: &RefCell<State>) -> Result<(), BoxedError> {
     if clock_running().await? {
         let task = get_task().await?;
         let time = get_start_time().await?;
-        eprintln!("Updater borrows state mutably");
         state.borrow_mut().state = Some(ClockProperties { task, time })
     } else {
-        eprintln!("Updater borrows state mutably");
         state.borrow_mut().state = None;
     }
 
@@ -154,7 +152,6 @@ async fn notify_loop(state: &RefCell<State>) {
         },
         Err(_e) => {
             eprintln!("Could not load configuration, will not be showing notifications");
-            eprintln!("{:?}", e);
         }
     }
 }
