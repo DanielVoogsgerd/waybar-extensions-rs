@@ -58,6 +58,27 @@ fn main() {
         })
         .collect::<Vec<_>>();
 
+    let oldest_file = repos
+        .iter()
+        .flat_map(|(_project_path, uncommitted_files)| {
+            uncommitted_files.iter().map(|(_path, age, _status)| age)
+        })
+        .max();
+
+    let age_class = if let Some(Some(oldest_age)) = oldest_file {
+        if *oldest_age > Duration::new(86400 * config.unfinished_projects.critical_age, 0) {
+            Some("critical")
+        } else if *oldest_age > Duration::new(86400 * config.unfinished_projects.warning_age, 0) {
+            Some("warning")
+        } else if *oldest_age > Duration::new(86400 * config.unfinished_projects.active_age, 0) {
+            Some("active")
+        } else {
+            None
+        }
+    } else {
+        None
+    };
+
     let mut output = repos
         .iter()
         .filter(|(_project_path, uncommitted_files)| {
@@ -65,7 +86,7 @@ fn main() {
                 .iter()
                 .max_by_key(|(_path, age, _status)| age)
             {
-                *max_age > Duration::new(60 * 60 * 24 * config.unfinished_projects.max_age, 0)
+                *max_age > Duration::new(86400 * config.unfinished_projects.active_age, 0)
             } else {
                 false
             }
@@ -88,11 +109,16 @@ fn main() {
     let tooltip = columnize_output(&output, &headings);
 
     let text = format!("{}", output.len());
+    let mut classes = vec![];
+
+    if let Some(class) = age_class {
+        classes.push(class.to_owned());
+    }
 
     let response = WaybarResponse {
         text,
         tooltip,
-        class: vec![],
+        class: classes,
     };
     let waybar_response =
         serde_json::to_string(&response).expect("Could not format waybar response");
