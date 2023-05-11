@@ -7,7 +7,7 @@ pub async fn get(lat: f32, lon: f32, api_key: &str) -> Result<Root, Box<dyn std:
     );
     let response: Root = reqwest::get(request_url).await?.json().await?;
 
-    return Ok(response);
+    Ok(response)
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]

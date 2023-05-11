@@ -60,7 +60,7 @@ async fn get_start_time() -> Result<DateTime<Local>, Box<dyn std::error::Error>>
     );
     let start_time_utc = DateTime::<Utc>::from_utc(naive_time, Utc);
     let start_time = DateTime::<Local>::from(start_time_utc);
-    return Ok(start_time);
+    Ok(start_time)
 }
 
 async fn updater(state: &RefCell<State>) -> Result<(), BoxedError> {
@@ -123,32 +123,29 @@ async fn notify_loop(state: &RefCell<State>) {
     match Config::load("waybar", "modules.toml") {
         Ok(config) => loop {
             let now = Local::now();
-            let state_ref = state.borrow();
-            if let Some(clock_properties) = &state_ref.state {
-                let delta = now - clock_properties.time.clone();
-                if delta.num_minutes() as u32 > config.org_clock.notify_time {
-                    if Notification::new()
-                        .summary("Time for a break")
-                        .body(&format!(
-                            "You've worked for {} minutes",
-                            delta.clone().num_minutes()
-                        ))
-                        .show()
-                        .is_err()
+            let delay = {
+                let state_ref = state.borrow();
+
+                if let Some(clock_properties) = &state_ref.state {
+                    let delta = now - clock_properties.time;
+                    if delta.num_minutes() as u32 > config.org_clock.notify_time
+                        && Notification::new()
+                            .summary("Time for a break")
+                            .body(&format!(
+                                "You've worked for {} minutes",
+                                delta.clone().num_minutes()
+                            ))
+                            .show()
+                            .is_err()
                     {
                         eprintln!("Could not send notification");
                     }
+                    get_notify_sleep_time(&config.org_clock, &delta)
+                } else {
+                    std::time::Duration::from_secs((60 * config.org_clock.notify_interval).into())
                 }
-
-                drop(state_ref);
-                tokio::time::sleep(get_notify_sleep_time(&config.org_clock, &delta)).await;
-            } else {
-                drop(state_ref);
-                tokio::time::sleep(std::time::Duration::from_secs(
-                    (60 * config.org_clock.notify_interval).into(),
-                ))
-                .await;
-            }
+            };
+            tokio::time::sleep(delay).await;
         },
         Err(_e) => {
             eprintln!("Could not load configuration, will not be showing notifications");

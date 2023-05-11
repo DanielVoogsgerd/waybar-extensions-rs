@@ -23,7 +23,7 @@ impl Config {
         let config_path = xdg::BaseDirectories::with_prefix(app_name)
             .or(Err("Could not load app configuration"))?
             .find_config_file(file_name)
-            .ok_or_else(|| "Could not load configuration file")?;
+            .ok_or("Could not load configuration file")?;
 
         Self::from_file(&config_path)
     }

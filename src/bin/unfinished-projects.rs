@@ -53,7 +53,7 @@ fn main() {
                         })
                         .collect::<Vec<_>>();
 
-                    (uncommitted_files.len() != 0).then_some((project_path, uncommitted_files))
+                    (!uncommitted_files.is_empty()).then_some((project_path, uncommitted_files))
                 })
         })
         .collect::<Vec<_>>();

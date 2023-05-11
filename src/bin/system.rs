@@ -34,19 +34,19 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let failed_units = output_string
         .split('\n')
         .skip(1)
-        .take_while(|&row| row != "")
+        .take_while(|&row| !row.is_empty())
         .filter_map(|row| {
             if row.split_ascii_whitespace().nth(3)? == "failed" {
                 return row.split_ascii_whitespace().nth(1);
             } else {
-                return None;
+                None
             }
         })
         .collect::<Vec<_>>();
 
     let warning_count = failed_units.len() + if outdated_kernel { 1 } else { 0 };
 
-    let class = if failed_units.len() != 0 {
+    let class = if !failed_units.is_empty() {
         vec!["critical".to_owned()]
     } else if outdated_kernel {
         vec!["warning".to_owned()]
