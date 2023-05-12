@@ -42,12 +42,20 @@ async fn main() {
     let wind_direction = get_wind_direction(weather.wind.deg as u16);
     let min_temp = weather.main.temp_min - 273.15;
     let max_temp = weather.main.temp_max - 273.15;
-    let sunrise_utc =
-        DateTime::<Utc>::from_utc(NaiveDateTime::from_timestamp(weather.sys.sunrise, 0), Utc);
-    let sunrise = DateTime::<Local>::from(sunrise_utc).format("%H:%M");
-    let sunset_utc =
-        DateTime::<Utc>::from_utc(NaiveDateTime::from_timestamp(weather.sys.sunset, 0), Utc);
-    let sunset = DateTime::<Local>::from(sunset_utc).format("%H:%M");
+
+    let sunrise = NaiveDateTime::from_timestamp_opt(weather.sys.sunrise, 0)
+        .map(|dt_naive| {
+            let dt_utc = DateTime::<Utc>::from_utc(dt_naive, Utc);
+            format!("{}", DateTime::<Local>::from(dt_utc).format("%H:%M"))
+        })
+        .unwrap_or("-".into());
+
+    let sunset = NaiveDateTime::from_timestamp_opt(weather.sys.sunset, 0)
+        .map(|dt_naive| {
+            let dt_utc = DateTime::<Utc>::from_utc(dt_naive, Utc);
+            format!("{}", DateTime::<Local>::from(dt_utc).format("%H:%M"))
+        })
+        .unwrap_or("-".into());
 
     let tooltip = format!("Rain: {rain_info} mm\nWind: {wind_speed} km/h ({wind_direction})\nTemperature: {min_temp:.1} - {max_temp:.1} °C\nSunrise: {sunrise}\nSunset: {sunset}");
 
