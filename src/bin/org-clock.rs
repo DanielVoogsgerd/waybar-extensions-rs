@@ -54,10 +54,11 @@ async fn get_task() -> Result<String, Box<dyn std::error::Error>> {
 async fn get_start_time() -> Result<DateTime<Local>, Box<dyn std::error::Error>> {
     let command = run_emacs_command(CLOCK_IN_TIME).await?;
     let start_time_float = command.parse::<f64>()?;
-    let naive_time = NaiveDateTime::from_timestamp(
+    let naive_time = NaiveDateTime::from_timestamp_opt(
         start_time_float as i64,
         (start_time_float % 1f64 * 1e9) as u32,
-    );
+    )
+    .ok_or("Could not convert timestamp to datetime")?;
     let start_time_utc = DateTime::<Utc>::from_utc(naive_time, Utc);
     let start_time = DateTime::<Local>::from(start_time_utc);
     Ok(start_time)
