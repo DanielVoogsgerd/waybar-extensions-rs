@@ -21,3 +21,6 @@ xdg = "2.5"
 futures = "0.3"
 notify-rust = "4.8"
 git2 = "0.17"
+# Move back to upstream once https://github.com/XAMPPRocky/octocrab/issues/363 is resolved
+octocrab = { git = "https://github.com/danielvoogsgerd/octocrab.git", tag="v0.21.0-hotpatch.0" }
+itertools = "0.10.5"
