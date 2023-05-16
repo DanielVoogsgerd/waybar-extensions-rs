@@ -43,12 +43,20 @@ async fn main() {
                 })
                 .join("\n");
 
+            let mut class = vec![];
+
+            if !notifications.items.is_empty() {
+                class.push(String::from("active"));
+            } else {
+                class.push(String::from("passive"));
+            }
+
             println!(
                 "{}",
                 json!(WaybarResponse {
                     text,
                     tooltip,
-                    class: vec![],
+                    class,
                 })
             );
         } else {
@@ -57,7 +65,7 @@ async fn main() {
                 json!(WaybarResponse {
                     text: String::from(""),
                     tooltip: String::from("Could not request notifications"),
-                    class: vec![],
+                    class: vec![String::from("warning")],
                 })
             );
         }
