@@ -29,7 +29,7 @@ async fn main() {
 
     loop {
         if let Ok(notifications) = octocrab.activity().notifications().list().send().await {
-            let text = format!(" {}", notifications.items.len());
+            let text = format!("{}", notifications.items.len());
 
             let tooltip = notifications
                 .items
@@ -55,7 +55,7 @@ async fn main() {
             println!(
                 "{}",
                 json!(WaybarResponse {
-                    text: String::from(" "),
+                    text: String::from(""),
                     tooltip: String::from("Could not request notifications"),
                     class: vec![],
                 })
