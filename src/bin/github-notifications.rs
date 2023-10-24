@@ -11,8 +11,9 @@ async fn main() {
 
     // let token = std::env::var("GITHUB_TOKEN").expect("GITHUB_TOKEN env variable is required");
     let token = String::from_utf8(
-        Command::new("pass")
-            .arg("Background/GitHub")
+        Command::new("gh")
+            .arg("auth")
+            .arg("token")
             .output()
             .await
             .expect("Could not get Github token")
