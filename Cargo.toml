@@ -16,7 +16,7 @@ reqwest={ version = "0.11", features = ["json"] }
 tokio = { version = "1", features = ["full"] }
 systemctl = "0.3.1"
 chrono = "0.4"
-toml = "0.7"
+toml = "0.8"
 xdg = "2.5"
 futures = "0.3"
 notify-rust = "4.8"
