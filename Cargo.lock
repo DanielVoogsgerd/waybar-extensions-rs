@@ -917,6 +917,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "itertools"
+version = "0.12.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ba291022dbbd398a455acf126c1e341954079855bc60dfdda641363bd6922569"
+dependencies = [
+ "either",
+]
+
+[[package]]
 name = "itoa"
 version = "1.0.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1987,7 +1996,7 @@ version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d813aabc24ee364be160eff576cd390b5c63e5dd5ea3b0947eb63f9aeab52eda"
 dependencies = [
- "itertools",
+ "itertools 0.11.0",
  "strum 0.25.0",
  "strum_macros 0.25.3",
 ]
@@ -2455,7 +2464,7 @@ dependencies = [
  "chrono",
  "futures",
  "git2",
- "itertools",
+ "itertools 0.12.1",
  "notify-rust",
  "octocrab",
  "reqwest",
