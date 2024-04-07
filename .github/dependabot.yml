@@ -9,6 +9,7 @@ updates:
     schedule:
       interval: monthly
     groups:
-      patches:
+      backwards-compatible:
         update-types:
         - "patch"
+        - "minor"
