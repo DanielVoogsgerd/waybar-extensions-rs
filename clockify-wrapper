@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# Wrapper for clockify-cli that triggers waybar module update after operations
+
+set -e
+
+# Run the clockify-cli command with all arguments
+clockify-cli "$@"
+EXIT_CODE=$?
+
+# Check if this was a clock in/out command that modifies state
+case "$1" in
+    in|out|stop|start|edit)
+        # Get socket path
+        SOCKET="${XDG_RUNTIME_DIR:-/tmp}/waybar-clockify.sock"
+        
+        # Send refresh command to socket if it exists
+        if [ -S "$SOCKET" ]; then
+            echo "refresh" | nc -U "$SOCKET" -w 1 2>/dev/null || \
+            echo "refresh" | socat - "UNIX-CONNECT:$SOCKET" 2>/dev/null || \
+            true
+        fi
+        ;;
+esac
+
+exit $EXIT_CODE
